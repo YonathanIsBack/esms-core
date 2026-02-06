@@ -1,6 +1,5 @@
 import { DataSource, EntityManager, EntityTarget, Repository } from 'typeorm';
 import { ENTITY_MANAGER_KEY } from './TransactionInterceptor';
-import { Customer } from 'src/customer/model/Customer.entity';
 
 export class StandardRepository<T> extends Repository<T> {
   constructor(
