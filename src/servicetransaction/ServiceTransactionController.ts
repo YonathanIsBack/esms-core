@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Post } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { ResourceNotFoundException } from 'src/exception/ResourceNotFoundException';
 import { GenericResponse } from 'src/util/response/GenericResponse';
 import { ServiceTransactionService } from './ServiceTransactionService';
 import { ServiceTransactionRequestDto } from './model/request/ServiceTransactionRequestDto';
+import PlainInvoiceUtil from 'src/util/PlainInvoiceUtil';
 
 @Controller()
 export class ServiceTransactionController {
@@ -27,9 +28,10 @@ export class ServiceTransactionController {
   }
 
   @Get('/service-transaction/:transactionCode/invoice/plain')
+  @Header('Content-Type', 'text/plain')
   async invoicePlainText(
     @Param('transactionCode') transactionCode: string,
-  ): Promise<GenericResponse> {
+  ): Promise<string> {
     const transaction =
       await this.serviceTransactionService.findByCode(transactionCode);
 
@@ -38,7 +40,7 @@ export class ServiceTransactionController {
         `Transaction with code ${transactionCode} `,
       );
 
-    return GenericResponse.okWithBody(this.buildTransaction(transaction));
+    return PlainInvoiceUtil.buildPlainInvoice(transaction);
   }
 
   @Get('/service-transaction')
