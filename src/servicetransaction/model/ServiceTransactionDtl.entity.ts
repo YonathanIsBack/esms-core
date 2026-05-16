@@ -39,4 +39,15 @@ export class ServiceTransactionDtl {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  ServiceTransactionDtl(body: {
+    description: string;
+    item_name: string;
+    price: number;
+    quantity: number;
+  }) {
+    this.solution = body.description;
+    this.itemName = body.item_name;
+    this.price = body.price;
+    this.quantity = body.quantity;
+  }
 }

@@ -60,7 +60,7 @@ export class ServiceTransactionController {
 
   @Post('/service-transaction')
   async createServiceTransaction(
-    @Body() requestBody: { customer_id: string; transaction_date: string },
+    @Body() requestBody: { customer_id: string; transaction_date: string , transaction_detail: []},
   ): Promise<GenericResponse> {
     const serviceTransactionRequestDto = new ServiceTransactionRequestDto(
       requestBody,
