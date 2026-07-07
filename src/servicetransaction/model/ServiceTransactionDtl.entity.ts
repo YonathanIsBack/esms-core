@@ -48,6 +48,5 @@ export class ServiceTransactionDtl {
     this.solution = body.description;
     this.itemName = body.item_name;
     this.price = body.price;
-    this.quantity = body.quantity;
   }
 }

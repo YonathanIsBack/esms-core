@@ -4,6 +4,7 @@ import { ServiceTransactionRepository } from './ServiceTransactionRepository';
 import { ServiceTransaction } from './model/ServiceTransaction.entity';
 import { ServiceTransactionRequestDto } from './model/request/ServiceTransactionRequestDto';
 import { CustomerService } from 'src/customer/CustomerService';
+import { ServiceTransactionDtlService } from './ServiceTransactionDtlService';
 
 enum status {
   CREATED = 'CREATED',
@@ -15,6 +16,7 @@ export class ServiceTransactionService {
     @InjectRepository(ServiceTransaction)
     private readonly serviceTransactionRepository: ServiceTransactionRepository,
     private readonly customerService: CustomerService,
+    private readonly serviceTransactionDtlService: ServiceTransactionDtlService,
   ) {}
 
   async findByCode(transactionCode: string) {
@@ -41,14 +43,14 @@ export class ServiceTransactionService {
     });
 
     const transactionCode = this.generateTransactionCode();
-    const serviceTransaction = this.serviceTransactionRepository.save({
+    const serviceTransaction = await this.serviceTransactionRepository.save({
       ...serviceTransactionRequestDto,
       customer,
       status: status.CREATED,
       transactionCode,
     });
 
-    
+    await this.serviceTransactionDtlService.saveBulk(serviceTransactionRequestDto.detail, serviceTransaction);
 
     return serviceTransaction;
   }
