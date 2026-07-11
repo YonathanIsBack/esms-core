@@ -36,12 +36,14 @@ export class UserService {
   }
 
   @UseInterceptors(TransactionInterceptor)
-  async create(userDto: UserDto): Promise<User> {
+  async create(userDto: UserDto): Promise<Omit<User, 'password'>> {
     await this.validateUserRegistrationRequest(userDto);
 
     const user = userDto.createUser();
     user.password = RsaManager.encrypt(user.password);
-    return this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    const { password: _, ...result } = saved;
+    return result;
   }
 
   private async validateUserRegistrationRequest(userDto: UserDto): Promise<void> {
