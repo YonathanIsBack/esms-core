@@ -7,6 +7,14 @@ import { UserDto } from './model/UserDto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Post('/login')
+  async login(
+    @Body() body: { username: string; password: string },
+  ): Promise<GenericResponse> {
+    const result = await this.userService.login(body.username, body.password);
+    return GenericResponse.okWithBody(result);
+  }
+
   @Get('/user')
   async getAll(): Promise<GenericResponse> {
     const users = await this.userService.findAll();

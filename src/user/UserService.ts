@@ -1,5 +1,7 @@
-import { Injectable, UseInterceptors } from '@nestjs/common';
+import { Injectable, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 import { TransactionInterceptor } from 'src/config/TransactionInterceptor';
+import RsaManager from 'src/config/RsaManager';
 import { ResourceNotFoundException } from 'src/exception/ResourceNotFoundException';
 import { UserRepository } from './UserRepository';
 import { User } from './model/User.entity';
@@ -36,7 +38,41 @@ export class UserService {
   @UseInterceptors(TransactionInterceptor)
   create(userDto: UserDto): Promise<User> {
     const user = userDto.createUser();
+    user.password = RsaManager.encrypt(user.password);
     return this.userRepository.save(user);
+  }
+
+  async login(
+    username: string,
+    password: string,
+  ): Promise<{ username: string; jwtToken: string; validUntil: string }> {
+    const user = await this.userRepository.findOneBy({ username });
+
+    if (user == null) {
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    let storedPassword: string;
+    try {
+      storedPassword = RsaManager.decrypt(user.password);
+    } catch {
+      storedPassword = user.password;
+    }
+
+    if (storedPassword !== password) {
+      throw new UnauthorizedException('Invalid username or password');
+    }
+
+    const token = jwt.sign(
+      { username: user.username },
+      RsaManager.getPrivateKey(),
+      { algorithm: 'RS256', expiresIn: '24h' },
+    );
+
+    const decoded = jwt.decode(token, { complete: true }) as any;
+    const validUntil = new Date(decoded.payload.exp * 1000).toISOString();
+
+    return { username: user.username, jwtToken: token, validUntil };
   }
 
   @UseInterceptors(TransactionInterceptor)
