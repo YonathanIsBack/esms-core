@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { TransactionInterceptor } from 'src/config/TransactionInterceptor';
 import RsaManager from 'src/config/RsaManager';
@@ -36,10 +36,48 @@ export class UserService {
   }
 
   @UseInterceptors(TransactionInterceptor)
-  create(userDto: UserDto): Promise<User> {
+  async create(userDto: UserDto): Promise<User> {
+    await this.validateUserRegistrationRequest(userDto);
+
     const user = userDto.createUser();
     user.password = RsaManager.encrypt(user.password);
     return this.userRepository.save(user);
+  }
+
+  private async validateUserRegistrationRequest(userDto: UserDto): Promise<void> {
+    const errors: string[] = [];
+
+    if (!userDto.username || userDto.username.trim().length === 0) {
+      errors.push('username is required');
+    } else if (userDto.username.length > 25) {
+      errors.push('username must not exceed 25 characters');
+    } else {
+      const existingUsername = await this.userRepository.findOneBy({
+        username: userDto.username,
+      });
+      if (existingUsername) {
+        errors.push('username already exists');
+      }
+    }
+
+    if (!userDto.password || userDto.password.trim().length === 0) {
+      errors.push('password is required');
+    }
+
+    if (!userDto.email || userDto.email.trim().length === 0) {
+      errors.push('email is required');
+    } else {
+      const existingEmail = await this.userRepository.findOneBy({
+        email: userDto.email,
+      });
+      if (existingEmail) {
+        errors.push('email already exists');
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors.join('; '));
+    }
   }
 
   async login(
