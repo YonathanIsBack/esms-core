@@ -82,6 +82,17 @@ export class UserService {
     }
   }
 
+  verifyToken(token: string): { valid: boolean } {
+    try {
+      jwt.verify(token, RsaManager.getPublicKey(), {
+        algorithms: ['RS256'],
+      });
+      return { valid: true };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
   async login(
     username: string,
     password: string,

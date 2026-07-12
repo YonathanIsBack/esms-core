@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UnauthorizedException } from '@nestjs/common';
 import { GenericResponse } from 'src/util/response/GenericResponse';
 import { UserService } from './UserService';
 import { UserDto } from './model/UserDto';
@@ -6,6 +6,18 @@ import { UserDto } from './model/UserDto';
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('/session/verify')
+  async verifySession(
+    @Headers('authorization') authorization: string,
+  ): Promise<GenericResponse> {
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Invalid or missing token');
+    }
+    const token = authorization.slice(7);
+    const result = await this.userService.verifyToken(token);
+    return GenericResponse.okWithBody(result);
+  }
 
   @Post('/login')
   async login(

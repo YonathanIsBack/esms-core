@@ -57,6 +57,11 @@ class RsaManager {
     return this.privateKey;
   }
 
+  static getPublicKey(): string {
+    this.ensureInitialized();
+    return this.publicKey;
+  }
+
   private static ensureInitialized(): void {
     if (!this.initialized) {
       this.initialize();
