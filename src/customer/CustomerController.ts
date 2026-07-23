@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { GenericResponse } from 'src/util/response/GenericResponse';
 import { CustomerService } from './CustomerService';
 import { CustomerDto } from './model/CustomerDto';
@@ -46,5 +46,14 @@ export class CustomerController {
     );
 
     return GenericResponse.okWithBody(updatedCustomer);
+  }
+
+  @Delete('/customer/:customerId')
+  async deleteCustomer(
+    @Param('customerId') customerId: number
+  ): Promise<GenericResponse> {
+    await this.customerService.delete(customerId);
+
+    return GenericResponse.ok();
   }
 }

@@ -61,3 +61,13 @@ CREATE TABLE esms.service_transaction_dtl_photo_tbl (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(25) NOT NULL,
+  `password` text NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

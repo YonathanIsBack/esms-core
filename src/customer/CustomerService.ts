@@ -28,6 +28,16 @@ export class CustomerService {
     return customer;
   }
 
+  async findBy(options: object): Promise<Customer> {
+    const customer = await this.customerRepository.findOneBy(options);
+
+    if (customer == null) {
+      throw new ResourceNotFoundException(Customer.name);
+    }
+
+    return customer;
+  }
+
   @UseInterceptors(TransactionInterceptor)
   create(customerDto: CustomerDto): Promise<Customer> {
     const customer = customerDto.createCustomer();
@@ -54,5 +64,9 @@ export class CustomerService {
       ...existingCustomer,
       ...customerDto,
     });
+  }
+
+  async delete(customerId: number) {
+    await this.customerRepository.delete({id: customerId});
   }
 }

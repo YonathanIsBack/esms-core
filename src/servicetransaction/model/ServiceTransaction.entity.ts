@@ -1,10 +1,16 @@
+import { Customer } from 'src/customer/model/Customer.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ServiceTransactionDtl } from './ServiceTransactionDtl.entity';
 
 @Entity('service_transaction_tbl')
 export class ServiceTransaction {
@@ -14,8 +20,9 @@ export class ServiceTransaction {
   @Column({ name: 'transaction_code' })
   transactionCode: string;
 
-  @Column({ name: 'customer_id' })
-  customerId: string;
+  @ManyToOne((type) => Customer)
+  @JoinColumn({ name: 'customer_id' })
+  customer: Customer;
 
   @Column({ name: 'transaction_date' })
   transactionDate: Date;
@@ -34,7 +41,7 @@ export class ServiceTransaction {
 
   @Column({ name: 'proof_of_payment' })
   proofOfPayment: string;
-  
+
   @Column({ name: 'total_payment' })
   totalPayment: string;
 
@@ -43,4 +50,8 @@ export class ServiceTransaction {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany((type) => ServiceTransactionDtl, (dtl) => dtl.serviceTransaction)
+  @JoinColumn({ name: 'transaction_id' })
+  serviceTransactionDtls: ServiceTransactionDtl[];
 }
