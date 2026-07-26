@@ -78,6 +78,7 @@ export class ServiceTransactionController {
       transaction_code: transaction.transactionCode,
       customer_name: transaction.customer.customerName,
       customer_phone: transaction.customer.customerPhone,
+      status: transaction.status,
       transaction_date: dayjs(transaction.transactionDate).format('DD-MM-YYYY'),
       total_price: transaction.serviceTransactionDtls.reduce(
         (tempSum, serviceTransactionDtl) =>
