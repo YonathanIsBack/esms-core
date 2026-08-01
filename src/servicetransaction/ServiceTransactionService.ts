@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceTransactionRepository } from './ServiceTransactionRepository';
-import { ServiceTransaction } from './model/ServiceTransaction.entity';
+import {
+  ServiceTransaction,
+  ServiceTransactionOperation,
+  ServiceTransactionStatus,
+} from './model/ServiceTransaction.entity';
 import { ServiceTransactionRequestDto } from './model/request/ServiceTransactionRequestDto';
 import { CustomerService } from 'src/customer/CustomerService';
 import { ServiceTransactionDtlService } from './ServiceTransactionDtlService';
+import { NoOperationFound } from 'src/exception/NoOperationFound';
+import { ResourceNotFoundException } from 'src/exception/ResourceNotFoundException';
+import { OperationConditionUnsatisfied } from 'src/exception/OperationConditionUnsatisfied';
 
 enum status {
   CREATED = 'CREATED',
@@ -50,12 +57,45 @@ export class ServiceTransactionService {
       transactionCode,
     });
 
-    await this.serviceTransactionDtlService.saveBulk(serviceTransactionRequestDto.detail, serviceTransaction);
+    await this.serviceTransactionDtlService.saveBulk(
+      serviceTransactionRequestDto.detail,
+      serviceTransaction,
+    );
 
     return serviceTransaction;
   }
 
   private generateTransactionCode(): string {
     return new Date().getTime().toString();
+  }
+
+  async processTransaction(
+    operationName: string,
+    serviceTransactionCode: string,
+  ) {
+    const serviceTransaction =
+      await this.serviceTransactionRepository.findOneBy({
+        transactionCode: serviceTransactionCode,
+      });
+
+    if (serviceTransaction == null) {
+      throw new ResourceNotFoundException(ServiceTransaction.name);
+    }
+
+    if (operationName == ServiceTransactionOperation.PAY) {
+      await this.#pay(serviceTransaction);
+      return;
+    }
+
+    throw new NoOperationFound(operationName);
+  }
+
+  async #pay(serviceTransaction: ServiceTransaction) {
+    if (serviceTransaction.status != ServiceTransactionStatus.CREATED) {
+      throw new OperationConditionUnsatisfied("Transaction status is not CREATED");
+    }
+
+    serviceTransaction.pay();
+    await this.serviceTransactionRepository.save(serviceTransaction);
   }
 }

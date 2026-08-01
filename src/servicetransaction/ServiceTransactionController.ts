@@ -60,7 +60,12 @@ export class ServiceTransactionController {
 
   @Post('/service-transaction')
   async createServiceTransaction(
-    @Body() requestBody: { customer_id: string; transaction_date: string , transaction_detail: []},
+    @Body()
+    requestBody: {
+      customer_id: string;
+      transaction_date: string;
+      transaction_detail: [];
+    },
   ): Promise<GenericResponse> {
     const serviceTransactionRequestDto = new ServiceTransactionRequestDto(
       requestBody,
@@ -71,6 +76,23 @@ export class ServiceTransactionController {
     );
 
     return GenericResponse.okWithBody(serviceTransaction);
+  }
+
+  @Post('/service-transaction/operation')
+  async operateServiceTransaction(
+    @Body()
+    requestBody: {
+      operationName: string;
+      serviceTransactionCode: string;
+    },
+  ) {
+    const { operationName, serviceTransactionCode } = requestBody;
+    this.serviceTransactionService.processTransaction(
+      operationName,
+      serviceTransactionCode,
+    );
+
+    return GenericResponse.ok();
   }
 
   private buildTransaction(transaction) {

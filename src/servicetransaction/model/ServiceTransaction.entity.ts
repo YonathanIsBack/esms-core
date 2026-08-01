@@ -54,4 +54,17 @@ export class ServiceTransaction {
   @OneToMany((type) => ServiceTransactionDtl, (dtl) => dtl.serviceTransaction)
   @JoinColumn({ name: 'transaction_id' })
   serviceTransactionDtls: ServiceTransactionDtl[];
+
+  pay() {
+    this.status = ServiceTransactionStatus.PAID;
+  }
 }
+
+export const ServiceTransactionStatus = Object.freeze({
+  CREATED: "CREATED",
+  PAID: "PAID"
+});
+
+export const ServiceTransactionOperation = Object.freeze({
+  PAY: "pay"
+})
