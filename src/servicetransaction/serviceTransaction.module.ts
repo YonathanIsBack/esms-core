@@ -9,9 +9,14 @@ import { ServiceTransaction } from './model/ServiceTransaction.entity';
 import { ServiceTransactionDtlService } from './ServiceTransactionDtlService';
 import { ServiceTransactionDtlRepository } from './ServiceTransactionDtlRepository';
 import { ServiceTransactionDtl } from './model/ServiceTransactionDtl.entity';
+import { HttpExceptionFilter } from 'src/exception/HttpExceptionFilter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ServiceTransaction]), TypeOrmModule.forFeature([ServiceTransactionDtl])],
+  imports: [
+    TypeOrmModule.forFeature([ServiceTransaction]),
+    TypeOrmModule.forFeature([ServiceTransactionDtl]),
+  ],
   controllers: [ServiceTransactionController],
   providers: [
     ServiceTransactionService,
@@ -19,7 +24,11 @@ import { ServiceTransactionDtl } from './model/ServiceTransactionDtl.entity';
     CustomerService,
     CustomerRepository,
     ServiceTransactionDtlService,
-    ServiceTransactionDtlRepository
+    ServiceTransactionDtlRepository,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
   ],
 })
 export class ServiceTransactionModule {}

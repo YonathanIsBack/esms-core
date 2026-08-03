@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpException, Param, Post } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { ResourceNotFoundException } from 'src/exception/ResourceNotFoundException';
 import { GenericResponse } from 'src/util/response/GenericResponse';
@@ -11,6 +11,11 @@ export class ServiceTransactionController {
   constructor(
     private readonly serviceTransactionService: ServiceTransactionService,
   ) {}
+
+  @Get('test')
+  exceptionTest() {
+    throw new HttpException("Yea", 404);
+  }
 
   @Get('/service-transaction/:transactionCode')
   async findByCode(
@@ -87,7 +92,7 @@ export class ServiceTransactionController {
     },
   ) {
     const { operationName, serviceTransactionCode } = requestBody;
-    this.serviceTransactionService.processTransaction(
+    await this.serviceTransactionService.processTransaction(
       operationName,
       serviceTransactionCode,
     );
