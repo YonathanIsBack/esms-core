@@ -10,8 +10,6 @@ import { UserController } from './UserController';
 import { UserRepository } from './UserRepository';
 import { UserService } from './UserService';
 import { User } from './model/User.entity';
-import { APP_FILTER } from '@nestjs/core';
-import { HttpExceptionFilter } from 'src/exception/HttpExceptionFilter';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -19,10 +17,6 @@ import { HttpExceptionFilter } from 'src/exception/HttpExceptionFilter';
   providers: [
     UserService,
     UserRepository,
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
   ],
 })
 export class UserModule implements NestModule {
