@@ -17,6 +17,15 @@ export class ServiceTransactionController {
     throw new HttpException("Yea", 404);
   }
 
+  @Get('/service-transaction/operation/:transactionCode')
+  async fetchOperations(
+    @Param('transactionCode') transactionCode: string,
+  ): Promise<GenericResponse> {
+    const operations =
+      await this.serviceTransactionService.fetchOperations(transactionCode);
+    return GenericResponse.okWithBody(operations);
+  }
+
   @Get('/service-transaction/:transactionCode')
   async findByCode(
     @Param('transactionCode') transactionCode: string,

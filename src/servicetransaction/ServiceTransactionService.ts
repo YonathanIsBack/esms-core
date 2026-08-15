@@ -17,6 +17,16 @@ enum status {
   CREATED = 'CREATED',
 }
 
+const OPERATIONS = {
+  CREATED: [
+    {
+      operationName: 'pay',
+      displayName: 'Pay',
+    },
+  ],
+  PAID: [],
+};
+
 @Injectable()
 export class ServiceTransactionService {
   constructor(
@@ -33,6 +43,17 @@ export class ServiceTransactionService {
     });
 
     return transaction;
+  }
+
+  async fetchOperations(transactionCode: string) {
+    const serviceTransaction =
+      await this.serviceTransactionRepository.findOneBy({ transactionCode });
+
+    if (serviceTransaction == null) {
+      throw new ResourceNotFoundException(ServiceTransaction.name);
+    }
+
+    return OPERATIONS[serviceTransaction.status] ?? [];
   }
 
   async findAll() {
