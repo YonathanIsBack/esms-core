@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomerRepository } from 'src/customer/CustomerRepository';
 import { CustomerService } from 'src/customer/CustomerService';
+import { AuthMiddleware } from 'src/user/AuthMiddleware';
 import { ServiceTransactionController } from './ServiceTransactionController';
 import { ServiceTransactionDtlRepository } from './ServiceTransactionDtlRepository';
 import { ServiceTransactionDtlService } from './ServiceTransactionDtlService';
@@ -25,4 +26,8 @@ import { ServiceTransactionDtl } from './model/ServiceTransactionDtl.entity';
     ServiceTransactionDtlRepository,
   ],
 })
-export class ServiceTransactionModule {}
+export class ServiceTransactionModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AuthMiddleware).forRoutes(ServiceTransactionController);
+  }
+}
