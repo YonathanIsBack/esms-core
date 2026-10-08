@@ -14,16 +14,16 @@ import { User } from './model/User.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [
-    UserService,
-    UserRepository,
-  ],
+  providers: [UserService, UserRepository],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(AuthMiddleware)
-      .exclude({ path: '/login', method: RequestMethod.POST })
+      .exclude(
+        { path: '/login', method: RequestMethod.POST },
+        { path: '/user', method: RequestMethod.POST },
+      )
       .forRoutes(UserController);
   }
 }
