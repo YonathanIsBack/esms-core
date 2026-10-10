@@ -92,18 +92,20 @@ export class ServiceTransactionController {
     return GenericResponse.okWithBody(serviceTransaction);
   }
 
-  @Post('/service-transaction/operation')
+  @Post('/service-transaction/operation/:transactionCode')
   async operateServiceTransaction(
+    @Param('transactionCode') transactionCode: string,
     @Body()
     requestBody: {
       operationName: string;
-      serviceTransactionCode: string;
+      operation: object;
     },
   ) {
-    const { operationName, serviceTransactionCode } = requestBody;
+    const { operationName, operation } = requestBody;
     await this.serviceTransactionService.processTransaction(
       operationName,
-      serviceTransactionCode,
+      transactionCode,
+      operation,
     );
 
     return GenericResponse.ok();

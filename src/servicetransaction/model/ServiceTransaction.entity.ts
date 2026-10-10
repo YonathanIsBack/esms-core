@@ -61,10 +61,10 @@ export class ServiceTransaction {
 }
 
 export const ServiceTransactionStatus = Object.freeze({
-  CREATED: "CREATED",
-  PAID: "PAID"
+  CREATED: 'CREATED',
+  PAID: 'PAID',
 });
 
 export const ServiceTransactionOperation = Object.freeze({
-  PAY: "pay"
-})
+  PAY: 'pay',
+});

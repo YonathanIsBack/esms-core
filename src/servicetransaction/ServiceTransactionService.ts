@@ -92,11 +92,12 @@ export class ServiceTransactionService {
 
   async processTransaction(
     operationName: string,
-    serviceTransactionCode: string,
+    transactionCode: string,
+    operation: object,
   ) {
     const serviceTransaction =
       await this.serviceTransactionRepository.findOneBy({
-        transactionCode: serviceTransactionCode,
+        transactionCode,
       });
 
     if (serviceTransaction == null) {
@@ -104,14 +105,14 @@ export class ServiceTransactionService {
     }
 
     if (operationName == ServiceTransactionOperation.PAY) {
-      await this.#pay(serviceTransaction);
+      await this.pay(serviceTransaction, operation);
       return;
     }
 
     throw new NoOperationFound(operationName);
   }
 
-  async #pay(serviceTransaction: ServiceTransaction) {
+  async pay(serviceTransaction: ServiceTransaction, operation: object) {
     if (serviceTransaction.status != ServiceTransactionStatus.CREATED) {
       throw new OperationConditionUnsatisfied("Transaction status is not CREATED");
     }
