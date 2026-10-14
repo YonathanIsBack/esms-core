@@ -22,11 +22,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
+    console.error(
+      `[${new Date().toISOString()}] ${request.method} ${request.url} -> ${status}`,
+      exception instanceof Error ? exception.stack : JSON.stringify(exception),
+    );
+
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: typeof message === 'object' ? (message as any).message || message : message,
+      message:
+        typeof message === 'object'
+          ? (message as any).message || message
+          : message,
     });
   }
 }
